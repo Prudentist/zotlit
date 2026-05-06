@@ -32,7 +32,7 @@ export function genManifestJson(
   } = {
     id,
     strict_min_version: "6.999",
-    strict_max_version: "8.*",
+    strict_max_version: "9.0.*",
   };
   if (update) zoteroApplication.update_url = update.versions;
 
