@@ -9,7 +9,7 @@
     "zotero": {
       "type": "object",
       "description": "Zotero plugin metadata",
-      "required": ["name", "id", "icons", "update"],
+      "required": ["name", "id", "icons"],
       "additionalProperties": false,
       "properties": {
         "name": {

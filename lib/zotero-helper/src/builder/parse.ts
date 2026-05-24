@@ -8,7 +8,7 @@ export interface PackageInfo {
   description: string;
   homepage: string;
   icons: Record<string, string>;
-  update: {
+  update?: {
     /** update.json */
     versions: string;
     /** url to each update's release */
@@ -45,7 +45,7 @@ export function getInfoFromPackageJson(packageJson: Record<string, unknown>) {
     homepage,
     icons,
     author,
-    update: {
+    update: update && {
       ...update,
       download: (version: string) =>
         update.download.replaceAll("{version}", version),

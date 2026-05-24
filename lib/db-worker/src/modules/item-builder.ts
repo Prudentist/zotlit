@@ -48,10 +48,6 @@ export default class ItemBuilder {
 
     return itemIDs.reduce((rec, [itemID, libraryID]) => {
       if (!itemID) return rec;
-      const citekey = citekeyMap[itemID];
-      if (!citekey) {
-        log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
-      }
       const fields = itemFields[itemID].reduce((fields, field) => {
         let { value } = field;
         if (field.fieldName === "date") {
@@ -60,6 +56,10 @@ export default class ItemBuilder {
         (fields[field.fieldName] ??= []).push(value);
         return fields;
       }, {} as Record<string, unknown[]>);
+      const citekey = citekeyMap[itemID] ?? getNativeCitationKey(fields);
+      if (!citekey) {
+        log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
+      }
 
       const { collectionIDs, ...data } = itemIDMap[itemID],
         collections = collectionIDs
@@ -72,7 +72,7 @@ export default class ItemBuilder {
         itemID,
         creators: creators[itemID],
         collections,
-        citekey: citekeyMap[itemID],
+        citekey,
         ...fields,
         dateAccessed: isWithAccessDate(fields)
           ? stringToDate(fields.accessDate[0])
@@ -91,6 +91,14 @@ function isWithAccessDate(item: unknown): item is { accessDate: [string] } {
     _item.accessDate.length === 1 &&
     typeof _item.accessDate[0] === "string"
   );
+}
+
+function getNativeCitationKey(fields: Record<string, unknown[]>) {
+  const citationKey = fields.citationKey;
+  if (!Array.isArray(citationKey) || typeof citationKey[0] !== "string") {
+    return null;
+  }
+  return citationKey[0];
 }
 
 /**

@@ -24,6 +24,18 @@ export function genManifestJson(
   const { name, version, description, author, homepage, id, update, icons } =
     info;
 
+  const zoteroApplication: {
+    id: string;
+    update_url?: string;
+    strict_min_version: string;
+    strict_max_version: string;
+  } = {
+    id,
+    strict_min_version: "6.999",
+    strict_max_version: "8.*",
+  };
+  if (update) zoteroApplication.update_url = update.versions;
+
   const output = {
     manifest_version: 2,
     name,
@@ -34,12 +46,7 @@ export function genManifestJson(
     // resources can be loaded by using a relative path directly
     icons: D.map(icons, (relative) => join(content.root, relative)),
     applications: {
-      zotero: {
-        id,
-        update_url: update.versions,
-        strict_min_version: "6.999",
-        strict_max_version: "7.0.*",
-      },
+      zotero: zoteroApplication,
     },
   };
   return JSON.stringify(output, null, 2);
@@ -76,3 +83,4 @@ export async function genInstallRdf(
   const eta = new Eta({ views: templateDir, varName: "pkg" });
   return eta.render("./install.rdf.ejs", info);
 }
+

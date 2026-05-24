@@ -20,18 +20,13 @@
   },
   "homepage": "https://github.com/PKM-er/obsidian-zotlit",
   "zotero": {
-    "name": "Obsidian Note for Zotero",
-    "id": "zotero-obsidian-note@aidenlx.top",
+    "name": "Obsidian Note for Zotero (Corey Fork)",
+    "id": "zotero-obsidian-note@corey.local",
     "icons": {
       "32": "logo.svg",
       "48": "logo.svg",
       "64": "logo.svg",
       "96": "logo.svg"
-    },
-    "update": {
-      "versions": "https://raw.githubusercontent.com/PKM-er/obsidian-zotlit/master/app/zotero/update.json",
-      "download": "https://github.com/PKM-er/obsidian-zotlit/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
-      "info": "https://github.com/PKM-er/obsidian-zotlit/releases/tag/zt{version}"
     }
   },
   "dependencies": {

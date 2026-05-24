@@ -7,6 +7,8 @@ export function genUpdateJson(
   hash: string,
 ) {
   const { id, version, update } = getInfoFromPackageJson(packageJson);
+  if (!update) return undefined;
+
   return {
     addons: {
       [id]: [
@@ -22,7 +24,7 @@ export function genUpdateJson(
             },
             /** Zotero 7 */ zotero: {
               strict_min_version: "6.999",
-              strict_max_version: "7.0.*",
+              strict_max_version: "8.*",
             },
           },
         },
@@ -30,3 +32,4 @@ export function genUpdateJson(
     },
   };
 }
+

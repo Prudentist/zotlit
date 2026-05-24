@@ -21,4 +21,11 @@ The required API feature for latest obsidian plugin is only available for:
 [![minimal obsidian version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://obsidian.md "minimal obsidian version")
 
 The latest zotero plugin currently supports:
-[![Zotero 6](https://custom-icon-badges.demolab.com/badge/zotero-6-bc3a3c?logo=zotero-32) ![Zotero 7](https://custom-icon-badges.demolab.com/badge/zotero-7-bc3a3c?logo=zotero-32)](https://www.zotero.org/download/ "supported zotero version")
+[![Zotero 6](https://custom-icon-badges.demolab.com/badge/zotero-6-bc3a3c?logo=zotero-32) ![Zotero 7](https://custom-icon-badges.demolab.com/badge/zotero-7-bc3a3c?logo=zotero-32) ![Zotero 8](https://custom-icon-badges.demolab.com/badge/zotero-8-bc3a3c?logo=zotero-32)](https://www.zotero.org/download/ "supported zotero version")
+
+Template compatibility note:
+
+- ZotLit keeps `it.citekey` as the stable template field for citation keys.
+- When building item data, ZotLit now resolves `it.citekey` from Better BibTeX first, and falls back to Zotero 8's built-in `citationKey` when Better BibTeX is unavailable.
+- Existing templates using `it.citekey` do not need to be changed for Zotero 8 built-in citation keys.
+- Zotero add-on update metadata now declares compatibility up to Zotero 8 (`strict_max_version: "8.*"`).
