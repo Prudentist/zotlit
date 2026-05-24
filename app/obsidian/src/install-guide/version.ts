@@ -2,9 +2,23 @@
 
 import { join } from "path/posix";
 import { betterSqlite3 } from "@obzt/common";
-import type { PluginManifest } from "obsidian";
 import { Platform } from "obsidian";
-import _PLATFORM_SUPPORT from "@/platform.json";
+
+// npm version is "12.8.0"; WiseLibs release tags and prebuilt filenames
+// use the "v12.8.0" form, so prepend the "v" here and hand out the prefixed
+// form everywhere downstream.
+export const BINARY_VERSION = `v${process.env.BETTER_SQLITE3_VERSION}`;
+
+// Injected at build time by esbuild as a bare identifier (see env.d.ts for the
+// `declare const`). Shape: { [modules]: { [platform]: arch[] } }.
+// Esbuild textually substitutes BETTER_SQLITE3_SUPPORT with the JS object
+// literal — no runtime JSON.parse needed.
+// DEV builds inject `{}` (no fetch), and the helpers below detect the empty
+// object and short-circuit — dev never gates on the matrix.
+export const PLATFORM_SUPPORT = BETTER_SQLITE3_SUPPORT;
+
+const isPlatformCheckBypassed = () =>
+  Object.keys(PLATFORM_SUPPORT).length === 0;
 
 const appDataDir: string | null = Platform.isDesktopApp
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -17,36 +31,6 @@ export const {
   versions: { modules, electron },
 } = process;
 
-export type ModuleVersions = keyof typeof _PLATFORM_SUPPORT;
-
-export const PLATFORM_SUPPORT = _PLATFORM_SUPPORT as Record<
-  ModuleVersions,
-  Record<string, string[]>
->;
-
-/**
- * @returns 0 if the version is supported, 1 if the version is newer than the latest supported version, -1 if the version is not supported
- */
-export const compareElectronVer = ({ modules }: PlatformDetails): number => {
-  if (modules in PLATFORM_SUPPORT) return 0;
-  const supportedVersions = Object.keys(PLATFORM_SUPPORT);
-  const supportedVersionsNum = supportedVersions
-    .map((v) => parseInt(v, 10))
-    .sort((a, b) => a - b);
-  const modulesNum = parseInt(modules, 10);
-  // If the version is newer than the latest supported version
-  if (modulesNum > supportedVersionsNum[supportedVersionsNum.length - 1]) {
-    return 1;
-  }
-  return -1;
-};
-
-export const isPlatformSupported = ({ platform, arch }: PlatformDetails) => {
-  return !!PLATFORM_SUPPORT[modules as ModuleVersions][platform]?.includes(
-    arch,
-  );
-};
-
 export interface PlatformDetails {
   /**
    * The operating system CPU architecture for which the Node.js binary was compiled.
@@ -58,37 +42,42 @@ export interface PlatformDetails {
   electron: string;
 }
 
-export const getPlatformDetails = () => {
-  if (Platform.isDesktopApp) {
-    return {
-      arch: process.arch,
-      platform: process.platform,
-      modules: process.versions.modules,
-      electron: process.versions.electron,
-    };
-  } else {
-    return null;
-  }
+/**
+ * @returns 0 if the current electron module version is supported OR if the
+ *            matrix is empty (dev build — check bypassed),
+ *          1 if it's newer than anything in the matrix (user needs to update plugin),
+ *         -1 if it's older than anything in the matrix (user needs to update obsidian).
+ */
+export const compareElectronVer = ({ modules }: PlatformDetails): number => {
+  if (isPlatformCheckBypassed()) return 0;
+  if (modules in PLATFORM_SUPPORT) return 0;
+  const supported = Object.keys(PLATFORM_SUPPORT)
+    .map((v) => parseInt(v, 10))
+    .sort((a, b) => a - b);
+  const cur = parseInt(modules, 10);
+  return cur > supported[supported.length - 1] ? 1 : -1;
 };
 
-export const getBinaryVersion = (manifest: PluginManifest) =>
-  manifest.versions?.["better-sqlite3"];
+export const isPlatformSupported = ({
+  modules,
+  platform,
+  arch,
+}: PlatformDetails) => {
+  if (isPlatformCheckBypassed()) return true;
+  return PLATFORM_SUPPORT[modules]?.[platform]?.includes(arch) ?? false;
+};
 
-export const getBinaryFullPath = (manifest: PluginManifest) => {
+export const getPlatformDetails = (): PlatformDetails | null => {
+  if (!Platform.isDesktopApp) return null;
+  return {
+    arch: process.arch,
+    platform: process.platform,
+    modules: process.versions.modules,
+    electron: process.versions.electron,
+  };
+};
+
+export const getBinaryFullPath = (): string | null => {
   if (!appDataDir) return null;
-  const binaryVersion = getBinaryVersion(manifest);
-  if (!binaryVersion) return null;
-
-  return join(appDataDir, betterSqlite3(binaryVersion));
+  return join(appDataDir, betterSqlite3(BINARY_VERSION));
 };
-
-// export const getBinaryFullPath = (manifest: PluginManifest): string | null => {
-//   const binaryPath = getBinaryPath(manifest);
-//   if (!binaryPath) {
-//     return null;
-//   }
-//   if (!(app.vault.adapter instanceof FileSystemAdapter)) {
-//     return null;
-//   }
-//   return app.vault.adapter.getFullPath(binaryPath);
-// };

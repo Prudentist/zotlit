@@ -1,4 +1,4 @@
-import type { Statement } from "@aidenlx/better-sqlite3";
+import type { Statement } from "better-sqlite3";
 import { checkID, PreparedWithParser } from "../../utils/index.js";
 import { sortBySortIndex } from "../../utils/misc.js";
 import type { Parsed, OutputBase, WithParentItem } from "./base.js";

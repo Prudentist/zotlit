@@ -1,4 +1,4 @@
-import type { Transaction } from "@aidenlx/better-sqlite3";
+import type { Transaction } from "better-sqlite3";
 import { fromPairs } from "@mobily/ts-belt/Dict";
 import type { IDLibID } from "../../utils/index.js";
 import { PreparedBase } from "../../utils/index.js";

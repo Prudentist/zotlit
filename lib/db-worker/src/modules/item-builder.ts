@@ -56,7 +56,7 @@ export default class ItemBuilder {
         (fields[field.fieldName] ??= []).push(value);
         return fields;
       }, {} as Record<string, unknown[]>);
-      const citekey = citekeyMap[itemID] ?? getNativeCitationKey(fields);
+      const citekey = citekeyMap[itemID];
       if (!citekey) {
         log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
       }
@@ -91,14 +91,6 @@ function isWithAccessDate(item: unknown): item is { accessDate: [string] } {
     _item.accessDate.length === 1 &&
     typeof _item.accessDate[0] === "string"
   );
-}
-
-function getNativeCitationKey(fields: Record<string, unknown[]>) {
-  const citationKey = fields.citationKey;
-  if (!Array.isArray(citationKey) || typeof citationKey[0] !== "string") {
-    return null;
-  }
-  return citationKey[0];
 }
 
 /**

@@ -5,7 +5,6 @@ import { InstallGuideModal } from "./guide";
 import type { GuideMode } from "./guide/atom";
 import {
   getBinaryFullPath,
-  getBinaryVersion,
   getPlatformDetails,
   compareElectronVer,
   isPlatformSupported,
@@ -41,12 +40,6 @@ const showInstallGuide = (
       `Your device (${platform.arch}-${platform.platform}) is not supported by zotlit`,
     );
   } else {
-    const binaryVersion = getBinaryVersion(manifest);
-    if (!binaryVersion) {
-      throw new Error(
-        `Cannot find binary version for ${manifest.name} v${manifest.version}`,
-      );
-    }
     // if platform is supported
     try {
       if (!statSync(libPath).isFile()) {
@@ -58,25 +51,13 @@ const showInstallGuide = (
         );
       } else if (mode === "reset") {
         // if path occupied by a file, open modal to reset it
-        new InstallGuideModal(
-          manifest,
-          platform,
-          binaryVersion,
-          mode,
-          app,
-        ).open();
+        new InstallGuideModal(manifest, platform, mode, app).open();
       }
     } catch (e) {
       const error = e as NodeJS.ErrnoException;
       if (error.code === "ENOENT") {
         // if path not occupied
-        new InstallGuideModal(
-          manifest,
-          platform,
-          binaryVersion,
-          mode,
-          app,
-        ).open();
+        new InstallGuideModal(manifest, platform, mode, app).open();
       } else {
         // unexpected error when checking path
         new Notice(
@@ -93,7 +74,7 @@ const checkLib = (manifest: PluginManifest, app: App): boolean => {
   if (!Platform.isDesktopApp) {
     throw new Error("Not in desktop app");
   }
-  const binaryPath = getBinaryFullPath(manifest);
+  const binaryPath = getBinaryFullPath();
   if (!binaryPath) {
     throw new Error(
       `Cannot find binary version for ${manifest.name} v${manifest.version}`,

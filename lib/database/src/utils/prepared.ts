@@ -1,4 +1,4 @@
-import type { Database, Statement } from "@aidenlx/better-sqlite3";
+import type { Database, Statement } from "better-sqlite3";
 
 export abstract class PreparedBase<
   Input extends {} | unknown[],

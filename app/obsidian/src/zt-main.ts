@@ -2,6 +2,8 @@ import "./main.less";
 import "./index.css";
 import "./dialog.less";
 
+process.env.SQLITE_USE_URI = "1";
+
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";
@@ -31,8 +33,10 @@ declare global {
   var zoteroAPI: PluginAPI | undefined;
 }
 
+type PluginContextOwner = Parameters<typeof use.plugin>[0];
+
 export default class ZoteroPlugin extends Plugin {
-  use = use.plugin(this);
+  use = use.plugin(this as unknown as PluginContextOwner);
 
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);

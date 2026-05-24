@@ -12,7 +12,6 @@ export class InstallGuideModal extends Modal {
   constructor(
     public manifest: PluginManifest,
     public platform: PlatformDetails,
-    public binaryVersion: string,
     public mode: GuideMode,
     public app: App,
   ) {

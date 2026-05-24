@@ -206,7 +206,13 @@ export default class Database extends Service {
   async #openDbConn() {
     const [paths, opts] = this.settings.dbConnParams;
 
+    log.debug("Opening Zotero databases", {
+      zotero: paths.zotero,
+      bbtMain: paths.bbtMain,
+      bbtSearch: paths.bbtSearch,
+    });
     const { main, bbtMain, bbtSearch } = await this.api.openDb(paths, opts);
+    log.debug("Zotero database open result", { main, bbtMain, bbtSearch });
     if (!bbtMain || bbtSearch === false) {
       log.debug("Failed to open Better BibTeX database, skipping...");
     }

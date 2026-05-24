@@ -12,8 +12,7 @@
     "paths": {
       "@/*": ["./*"],
       "@c/*": ["../../../lib/components/src/components/*"],
-      "@log": ["./logger.ts"],
-      "support-platform": ["./platform.json"]
+      "@log": ["./logger.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/worker-web/*/api.ts"],

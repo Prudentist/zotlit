@@ -1,0 +1,16 @@
+# Tool versions for the obsidian-zotero Rush monorepo.
+#
+# Source of truth is rush.json — keep these in sync when bumping there:
+#   rush.json "rushVersion"                 -> npm:@microsoft/rush
+#   rush.json "pnpmVersion"                 -> pnpm
+#   rush.json "nodeSupportedVersionRange"   -> node (must satisfy ">=18.12.0")
+#
+# Note: Rush uses its own version selector and installs a private copy of pnpm
+# into common/temp/ based on rush.json. The pnpm pinned here is only for
+# direct `pnpm` invocations outside of Rush; pinning the same version avoids
+# drift between the two.
+
+[tools]
+node = "20"
+pnpm = "9.5.0"
+"npm:@microsoft/rush" = "5.107.4"

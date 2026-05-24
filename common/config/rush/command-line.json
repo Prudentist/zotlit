@@ -12,14 +12,6 @@
    */
   "commands": [
     {
-      "name": "commitlint",
-      "commandKind": "global",
-      "summary": "Used by the pre-commit Git hook. This command invokes commitlint to ensure that the commit messages meet the conventional commit format",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "rush-commitlint",
-      "shellCommand": "commitlint"
-    },
-    {
       "commandKind": "bulk",
       "name": "build",
       "summary": "Build all projects that haven't been built, or have changed since they were last built",
@@ -192,13 +184,6 @@
    * For example, you might define a "--production" parameter for the "rush build" command.
    */
   "parameters": [
-    {
-      "parameterKind": "string",
-      "argumentName": "MESSAGE",
-      "longName": "--edit",
-      "description": "",
-      "associatedCommands": ["commitlint"]
-    }
     // {
     //   /**
     //    * (Required) Determines the type of custom parameter.

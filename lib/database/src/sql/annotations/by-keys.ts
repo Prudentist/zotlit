@@ -1,4 +1,4 @@
-import type { Transaction } from "@aidenlx/better-sqlite3";
+import type { Transaction } from "better-sqlite3";
 import { checkID, PreparedBase } from "../../utils/index.js";
 import type { OutputBase, Parsed, WithParentItem } from "./base.js";
 import { toParsed, from, select } from "./base.js";

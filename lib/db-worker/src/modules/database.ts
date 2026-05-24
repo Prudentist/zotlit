@@ -1,9 +1,9 @@
-import { statSync } from "fs";
+import { statSync } from "node:fs";
 import type {
   Database as DatabaseInstance,
   Statement,
-} from "@aidenlx/better-sqlite3";
-import DatabaseConstructor from "@aidenlx/better-sqlite3";
+} from "better-sqlite3";
+import DatabaseConstructor from "better-sqlite3";
 import log from "@log";
 import type { PreparedBase, PreparedBaseCtor } from "@obzt/database";
 import type { DatabaseOptions } from "@obzt/database/api";
@@ -13,6 +13,8 @@ export class DatabaseNotSetError extends Error {
     super("Database not set");
   }
 }
+
+globalThis.sqlite3 = DatabaseConstructor
 
 const getMtime = (dbPath: string) => {
   try {
@@ -93,6 +95,7 @@ export default class Database {
    * @returns A new instance of the SQLite database.
    */
   public open(file: string, opts: DatabaseOptions): boolean {
+    const uri = toSqliteUri(file);
     try {
       if (this.database?.instance) {
         log.debug(
@@ -104,21 +107,23 @@ export default class Database {
       const mtime = getMtime(file);
       // file not exists
       if (mtime === -1) {
+        log.debug(`Database file not found, skipping open: ${uri}`);
         this.opened = false;
         return false;
       }
+      log.debug(`Opening database: ${uri}`);
       this.database = {
         mtime,
-        instance: initDatabase(file, opts),
+        instance: initDatabase(uri, opts),
         file,
         existStatements: {},
         prepared: new Map(),
       };
-      log.debug("Database opened: ", file);
+      log.debug(`Database opened: ${uri}`);
       this.opened = true;
       return true;
     } catch (error) {
-      log.error("Failed to open database", file);
+      log.error(`Failed to open database: ${uri}`, error);
       throw error;
     }
   }
@@ -141,17 +146,22 @@ export default class Database {
   }
 }
 
+// immutable tag to prevent database locked error
+export const toSqliteUri = (path: string) =>
+  `file:${path}?mode=ro&immutable=1`;
+
 /**
  * Initializes a new instance of the SQLite database.
- * @param path - The path to the database file.
+ * @param uri - SQLite URI (see {@link toSqliteUri}).
  * @param binding - The path to the SQLite nodejs native binding binary.
  * @returns A new instance of the SQLite database.
  */
-function initDatabase(path: string, opts: DatabaseOptions) {
-  // immutable tag to prevent database locked error
-  return new DatabaseConstructor(`file:${path}?mode=ro&immutable=1`, {
+function initDatabase(uri: string, opts: DatabaseOptions) {
+  // Enable SQLite URI filename support before the native binding is loaded.
+  // Must run before `new DatabaseConstructor(...)` below — that call lazily
+  // `require()`s the .node, which reads SQLITE_USE_URI once at load time.
+  return new DatabaseConstructor(uri, {
     nativeBinding: opts.nativeBinding,
-    uriPath: true,
     verbose: process.env.SQL_VERBOSE
       ? (message?: any, ...additionalArgs: any[]) =>
           log.trace(`SQL: ${message}`, ...additionalArgs)
